@@ -1,3 +1,6 @@
 *.pyc
 *.npy
 .DS_Store
+.conda/
+.venv/
+**histogram_all_full.npz
