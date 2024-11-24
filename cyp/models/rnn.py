@@ -159,6 +159,8 @@ class RNNet(nn.Module):
             hidden_state = hidden_state.cuda()
             cell_state = cell_state.cuda()
 
+        print('x before rnn', x.shape)
+
         for i in range(sequence_length):
             # The reason the RNN is unrolled here is to apply dropout to each timestep;
             # The rnn_dropout argument only applies it after each layer. This better mirrors
@@ -169,12 +171,24 @@ class RNNet(nn.Module):
                 input_x, (hidden_state, cell_state)
             )
             hidden_state = self.dropout(hidden_state)
+        
+        print('hidden_state', hidden_state.shape)
+
 
         x = hidden_state.squeeze(0)
+        print('after squeeze', x.shape)
         for layer_number, dense_layer in enumerate(self.dense_layers):
+            print('dense layer shape', dense_layer.weight.shape)
             x = dense_layer(x)
             if return_last_dense and (layer_number == len(self.dense_layers) - 2):
                 output = x
+
+        print('x after dense', x.shape)
+
+        #stop execution to check shapes
+        breakpoint()
+
+        print(sequence_length)
         if return_last_dense:
             return x, output
         return x

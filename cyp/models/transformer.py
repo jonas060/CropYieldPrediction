@@ -166,26 +166,20 @@ class TransformerNet(nn.Module):
         # Reshape to [batch, times, bands * bins]
         
         x = x.permute(0, 2, 1, 3).contiguous()
-        
-        
         x = x.view(x.shape[0], x.shape[1], x.shape[2] * x.shape[3])
 
-
-        #initialize hidden and cell states
-        hidden_state = torch.zeros(1, x.shape[0], self.d_model)
-        cell_state = torch.zeros(1, x.shape[0], self.d_model)
-
-        if x.is_cuda:
-            hidden_state = hidden_state.cuda()
-            cell_state = cell_state.cuda()
+        print('x before transformer', x.shape)
 
         x = self.transformer_encoder(x, src_key_padding_mask=None)
 
+        print('x after transformer', x.shape)
 
         for dense_layer in self.dense_layers[:-1]:
             x = F.relu(dense_layer(x))
 
         output = self.dense_layers[-1](x)
+
+        print('x after dense', x.shape)
 
         if return_last_dense:
             return output, x

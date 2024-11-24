@@ -2,7 +2,7 @@ import torch
 from pathlib import Path
 
 from cyp.data import MODISExporter, DataCleaner, Engineer
-from cyp.models import ConvModel, RNNModel, TransformerModel
+from cyp.models import ConvModel, RNNModel, TransformerEncoderModel
 
 import fire
 
@@ -383,7 +383,7 @@ class RunTask:
 
 #train transformer
     @staticmethod
-    def train_transformer(
+    def train_transformer_encoder(
         cleaned_data_path="data/img_output",
         num_bins=32,
         d_model=288,
@@ -402,7 +402,7 @@ class RunTask:
         weight_decay=0,
         l1_weight=0,
         patience=10,
-        use_gp=True,
+        use_gp=False,
         sigma=1,
         r_loc=0.5,
         r_year=1.5,
@@ -481,7 +481,7 @@ class RunTask:
         """
         histogram_path = Path(cleaned_data_path) / "histogram_all_full.npz"
 
-        model = TransformerModel(
+        model = TransformerEncoderModel(
             in_channels=9,
             num_bins=num_bins,
             d_model=d_model,
