@@ -1,6 +1,6 @@
 from pathlib import Path
 import numpy as np
-import gdal
+from osgeo import gdal
 import math
 from itertools import repeat
 from concurrent.futures import ProcessPoolExecutor
@@ -64,7 +64,7 @@ class DataCleaner:
             ["Year", "State ANSI", "County ANSI"]
         ].values
 
-    def process(self, num_years=14, delete_when_done=False, checkpoint=True):
+    def process(self, num_years=6, delete_when_done=False, checkpoint=True):
         """
         Process all the data.
 
@@ -244,7 +244,7 @@ def process_county(
 # helper methods for the data cleaning class
 
 
-def divide_into_years(img, bands, composite_period, num_years=14, extend=False):
+def divide_into_years(img, bands, composite_period, num_years=6, extend=False):
     """
     Parameters
     ----------

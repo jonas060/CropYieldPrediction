@@ -16,8 +16,10 @@ def get_tif_files(image_path):
     """
     files = []
     for dir_file in image_path.iterdir():
+        print(dir_file)
         if str(dir_file).endswith("tif"):
             files.append(str(dir_file.name))
+    print(len(files))
     return files
 
 

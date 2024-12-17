@@ -32,7 +32,7 @@ class MODISExporter:
         self.collection_id = collection_id
 
         try:
-            ee.Initialize(project = 'csci8953')
+            ee.Initialize()
             print("The Earth Engine package initialized successfully!")
         except ee.EEException:
             print(
@@ -82,7 +82,7 @@ class MODISExporter:
         max_img_val=None,
         major_states_only=True,
         check_if_done=True,
-        download_folder=Path("/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_image/"),#img_extract
+        download_folder=Path("/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_image/"), #img_extract
     ):
         """Export an Image Collection from Earth Engine to Google Drive
 
@@ -118,17 +118,16 @@ class MODISExporter:
                 in data/folder_name
         """
         if check_if_done:
-            print(download_folder + ". Check if done set to True.")
+            print("Check if done is set to True.")
+            print(download_folder)
             if download_folder is None:
-                print(Path("Data"))
                 download_folder = Path("Data") / folder_name
-                already_downloaded = get_tif_files(download_folder)
+            already_downloaded = get_tif_files(download_folder)
 
         imgcoll = (
             ee.ImageCollection(self.collection_id)
             .filterBounds(ee.Geometry.Rectangle(-106.5, 50, -64, 23))
-            .filterDate("2017-1-1", "2023-12-31")
-            #.filterDate("2002-12-31", "2016-8-4")
+            .filterDate("2002-12-31", "2016-8-4")
         )
 
         datatype_to_func = {
@@ -177,7 +176,6 @@ class MODISExporter:
                     continue
 
             fname = "{}_{}".format(int(state_id), int(county_id))
-            print(fname)
 
             if check_if_done:
                 if f"{fname}.tif" in already_downloaded:
@@ -218,9 +216,7 @@ class MODISExporter:
         export_limit=None,
         major_states_only=True,
         check_if_done=True,
-        download_folder=["/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_image/",
-                         "/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_mask/",
-                         "/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_temperature/"],
+        download_folder=None,
     ):
         """
         Export all the data.
@@ -253,26 +249,26 @@ class MODISExporter:
         )
 
         # pull_MODIS_landcover_entire_county_clip.py
-        #self.update_parameters(collection_id="MODIS/006/MCD12Q1")
-        #self.export(
-        #    folder_name="crop_yield-data_mask",
-        #    data_type="mask",
-        #    export_limit=export_limit,
-        #    major_states_only=major_states_only,
-        #    check_if_done=check_if_done,
-        #    download_folder=download_folder[1],
-        #)
+        self.update_parameters(collection_id="MODIS/006/MCD12Q1")
+        self.export(
+            folder_name="crop_yield-data_mask",
+            data_type="mask",
+            export_limit=export_limit,
+            major_states_only=major_states_only,
+            check_if_done=check_if_done,
+            download_folder=download_folder[1],
+        )
 
         # pull_MODIS_temperature_entire_county_clip.py
-        #self.update_parameters(collection_id="MODIS/MYD11A2")
-        #self.export(
-        #    folder_name="crop_yield-data_temperature",
-        #    data_type="temperature",
-        #    export_limit=export_limit,
-        #    major_states_only=major_states_only,
-        #    check_if_done=check_if_done,
-        #    download_folder=download_folder[2],
-        #)
+        self.update_parameters(collection_id="MODIS/MYD11A2")
+        self.export(
+            folder_name="crop_yield-data_temperature",
+            data_type="temperature",
+            export_limit=export_limit,
+            major_states_only=major_states_only,
+            check_if_done=check_if_done,
+            download_folder=download_folder[2],
+        )
         print("Done exporting! Download the folders from your Google Drive")
 
 
