@@ -1,6 +1,6 @@
 # Extension
 
-Extension of the Pycrop Yield Prediction project. The extension to the project includes the removal of the CNN model and implementation of a Transformer architecture. The LSTM and Transformer were compared to determine which approach resulted in the most accurate prediction for bushels/acre at the county level for 11 U.S. states responsible for 75% of soyebean production. Accuracy for the LSTM and Transformer was measured via RMSE.
+Extension of the Pycrop Yield Prediction project. The extension to the project includes the removal of the CNN model and implementation of a Transformer architecture. The LSTM and Transformer were compared to determine which approach resulted in the most accurate prediction for bushels/acre at the county level for 11 U.S. states responsible for 75% of soybean production. Accuracy for the LSTM and Transformer was measured via RMSE.
 
 
 # PyCrop Yield Prediction
