@@ -61,7 +61,7 @@ class ModelBase:
         num_runs=2,
         train_steps=25000,
         batch_size=32,
-        starter_learning_rate=1e-3,
+        starter_learning_rate=1e-4,
         weight_decay=0,
         l1_weight=0,
         patience=10,
@@ -171,7 +171,7 @@ class ModelBase:
             data["RMSE_GP"] = rmse_gp_list
             data["ME_GP"] = me_gp_list
         results_df = pd.DataFrame(data=data)
-        results_df.to_csv(self.savedir / f"{str(datetime.now())}.csv", index=False)
+        results_df.to_csv(self.savedir / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv", index=False)
 
     def _run_1_year(
         self,
@@ -224,14 +224,15 @@ class ModelBase:
             model_information[key] = results[key]
 
         # finally, get the relevant weights for the Gaussian Process
-        model_weight = self.model.state_dict()[self.model_weight]
-        model_bias = self.model.state_dict()[self.model_bias]
+        if self.gp is not None:
+            model_weight = self.model.state_dict()[self.model_weight]
+            model_bias = self.model.state_dict()[self.model_bias]
 
-        if self.model.state_dict()[self.model_weight].device != "cpu":
-            model_weight, model_bias = model_weight.cpu(), model_bias.cpu()
+            if self.model.state_dict()[self.model_weight].device != "cpu":
+                model_weight, model_bias = model_weight.cpu(), model_bias.cpu()
 
-        model_information["model_weight"] = model_weight.numpy()
-        model_information["model_bias"] = model_bias.numpy()
+            model_information["model_weight"] = model_weight.numpy()
+            model_information["model_bias"] = model_bias.numpy()
 
         if self.gp is not None:
             print("Running Gaussian Process!")

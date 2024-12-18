@@ -57,6 +57,11 @@ class TransformerEncoderModel(ModelBase):
         activation='relu',
         savedir=Path("data/models"),
         use_gp=True,
+        sigma=1,
+        r_loc=0.5,
+        r_year=1.5,
+        sigma_e=0.01,
+        sigma_b=0.01,
         device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
         dtype=torch.float32,
     ):
@@ -88,6 +93,11 @@ class TransformerEncoderModel(ModelBase):
             "transformer_encoder",
             savedir,
             use_gp,
+            sigma,
+            r_loc,
+            r_year,
+            sigma_e,
+            sigma_b,
             device,
         )
 
@@ -100,18 +110,18 @@ class TransformerNet(nn.Module):
     def __init__(self,
                  in_channels=9,
                  num_bins=32,
-                 d_model=128,
+                 d_model=512,
                  nhead=8,
                  num_encode_layers=6,
-                 dim_feedforward=512,
+                 dim_feedforward=2048,
                  dense_features=None,
                  layer_norm_eps=1e-5,
                  activation='relu'):
         super().__init__()
         
         if dense_features is None:
-            dense_features = [256, 1]
-        dense_features.insert(0, 9216)
+            dense_features = [1]
+        dense_features.insert(0, d_model * num_bins)
         
         
         self.encoder_layer = nn.TransformerEncoderLayer(
@@ -121,6 +131,10 @@ class TransformerNet(nn.Module):
             activation=activation,
             layer_norm_eps=layer_norm_eps,
         )
+
+        #turn on batch first
+        self.encoder_layer.batch_first = True
+        self.encoder_layer.self_attn.batch_first = True
 
         self.d_model = d_model
 
@@ -147,16 +161,16 @@ class TransformerNet(nn.Module):
         for weights and constant initialization for biases. It also initializes the weights of the dense
         layers using Kaiming uniform initialization for weights and constant initialization for biases.
         """
-        for parameters in self.transformer_encoder.parameters():
-            if len(parameters.shape) > 1:
-                nn.init.xavier_uniform_(parameters.data)
-            else:
-                nn.init.constant_(parameters.data, 0)
+        for name, param in self.transformer_encoder.named_parameters():
+            if "weight" in name and len(param.shape) > 1:
+                nn.init.xavier_uniform_(param)
+            elif "bias" in name:
+                nn.init.constant_(param, 0)
 
-        #initialize dense layers
         for dense_layer in self.dense_layers:
-            nn.init.kaiming_uniform_(dense_layer.weight.data)
-            nn.init.constant_(dense_layer.bias.data, 0)
+            nn.init.kaiming_uniform_(dense_layer.weight)
+            nn.init.constant_(dense_layer.bias, 0)
+
 
     def forward(self, x, return_last_dense=False):
         """
@@ -178,11 +192,12 @@ class TransformerNet(nn.Module):
 
         for layer_number, dense_layer in enumerate(self.dense_layers):
             x = dense_layer(x)
-            if return_last_dense and (layer_number == len(self.dense_layers) - 2):
-                output = x
+        #     if return_last_dense and (layer_number == len(self.dense_layers) - 2):
+        #         output = x
+        
 
-
-        if return_last_dense:
-            return output, x
-        else:
-            return x
+        # if return_last_dense:
+        #     return x, output
+        # else:
+        #     return x
+        return x
