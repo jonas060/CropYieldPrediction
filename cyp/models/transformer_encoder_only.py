@@ -110,17 +110,17 @@ class TransformerNet(nn.Module):
     def __init__(self,
                  in_channels=9,
                  num_bins=32,
-                 d_model=128,
+                 d_model=512,
                  nhead=8,
                  num_encode_layers=6,
-                 dim_feedforward=512,
+                 dim_feedforward=2048,
                  dense_features=None,
                  layer_norm_eps=1e-5,
                  activation='relu'):
         super().__init__()
         
         if dense_features is None:
-            dense_features = [d_model * num_bins, 256, 1]
+            dense_features = [1]
         dense_features.insert(0, d_model * num_bins)
         
         
@@ -161,8 +161,15 @@ class TransformerNet(nn.Module):
         for weights and constant initialization for biases. It also initializes the weights of the dense
         layers using Kaiming uniform initialization for weights and constant initialization for biases.
         """
+        for name, param in self.transformer_encoder.named_parameters():
+            if "weight" in name and len(param.shape) > 1:
+                nn.init.xavier_uniform_(param)
+            elif "bias" in name:
+                nn.init.constant_(param, 0)
 
-
+        for dense_layer in self.dense_layers:
+            nn.init.kaiming_uniform_(dense_layer.weight)
+            nn.init.constant_(dense_layer.bias, 0)
 
 
     def forward(self, x, return_last_dense=False):
@@ -185,11 +192,12 @@ class TransformerNet(nn.Module):
 
         for layer_number, dense_layer in enumerate(self.dense_layers):
             x = dense_layer(x)
-            if return_last_dense and (layer_number == len(self.dense_layers) - 2):
-                output = x
+        #     if return_last_dense and (layer_number == len(self.dense_layers) - 2):
+        #         output = x
         
 
-        if return_last_dense:
-            return x, output
-        else:
-            return x
+        # if return_last_dense:
+        #     return x, output
+        # else:
+        #     return x
+        return x

@@ -18,8 +18,8 @@ class RunTask:
         export_limit=None,
         major_states_only=True,
         check_if_done=True,
-        download_folder="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_image/",
-        yield_data_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/USDA/yield_data.csv",
+        download_folder=None,
+        yield_data_path="data/yield_data.csv",
     ):
         """
         Export all the data necessary to train the models.
@@ -50,11 +50,11 @@ class RunTask:
 
     @staticmethod
     def process(
-        mask_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_mask",
-        temperature_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_temperature",
-        image_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/crop_yield-data_image",
-        yield_data_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/USDA/yield_data.csv",
-        cleaned_data_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/Data/img_output",
+        mask_path="data/crop_yield-data_mask",
+        temperature_path="data/crop_yield-data_temperature",
+        image_path="data/crop_yield-data_image",
+        yield_data_path="data/yield_data.csv",
+        cleaned_data_path="data/img_output",
         multiprocessing=False,
         processes=4,
         parallelism=6,
@@ -155,10 +155,10 @@ class RunTask:
 
     @staticmethod
     def train_cnn(
-        cleaned_data_path=Path("/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/data/img_extract"),
+        cleaned_data_path=Path("data/img_output"),
         dropout=0.5,
         dense_features=None,
-        savedir=Path("/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/PythonFiles/models"),
+        savedir=Path("data/models"),
         times="all",
         pred_years=None,
         num_runs=2,
@@ -265,21 +265,21 @@ class RunTask:
 
     @staticmethod
     def train_rnn(
-        cleaned_data_path="/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/data/img_output",
+        cleaned_data_path="data/img_output",
         num_bins=32,
         hidden_size=128,
         rnn_dropout=0.75,
         dense_features=None,
-        savedir=Path("/content/drive/MyDrive/CSCI-8523-AI-For-Earth-Group-Folder/PythonFiles/models"),
+        savedir=Path("data/models"),
         times="all",
         pred_years=None,
-        num_runs=2,
+        num_runs=1,
         train_steps=10000,
         batch_size=32,
         starter_learning_rate=1e-3,
         weight_decay=0,
         l1_weight=0,
-        patience=10,
+        patience=2,
         use_gp=True,
         sigma=1,
         r_loc=0.5,
@@ -387,22 +387,22 @@ class RunTask:
         cleaned_data_path="data/img_output",
         num_bins=32,
         d_model=288,
-        nhead=32,
-        num_encode_layers=16,
+        nhead=8,
+        num_encode_layers=8,
         dense_features=None,
         dim_feedforward=2048,
         layer_norm_eps=1e-5,
         savedir=Path("data/models"),
         times="all",
-        pred_years=None,
-        num_runs=10,
+        pred_years= None,
+        num_runs=1,
         train_steps=20000,
         batch_size=32,
-        starter_learning_rate=1e-6,
-        weight_decay=0,
+        starter_learning_rate=1e-5,
+        weight_decay= 1e-8,
         l1_weight=0,
-        patience=2,
-        use_gp=True,
+        patience=10,
+        use_gp=False,
         sigma=1,
         r_loc=0.5,
         r_year=1.5,
@@ -511,6 +511,8 @@ class RunTask:
             l1_weight,
             patience
         )
+
+
 
 if __name__ == "__main__":
     fire.Fire(RunTask)
